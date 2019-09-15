@@ -52,6 +52,7 @@ class MQTTClient:
     self.lw_retain = retain
 
   def connect(self, clean_session=True):
+   try:
     self.sock = socket.socket()
     self.sock.connect(self.addr)
     if self.ssl:
@@ -75,16 +76,27 @@ class MQTTClient:
     #print(hex(len(msg)), hexlify(msg, ":"))
     self._send_str(self.client_id)
     if self.lw_topic:
+      print(4.1)
       self._send_str(self.lw_topic)
+      print(4.2)
       self._send_str(self.lw_msg)
+      print(4.3)
     if self.user is not None:
+      print(4.4)
       self._send_str(self.user)
+      print(4.5)
       self._send_str(self.pswd)
+      print(4.6,self._send_str)
     resp = self.sock.read(4)
+    print(5,resp)
     assert resp[0] == 0x20 and resp[1] == 0x02
+    print(6)
     if resp[3] != 0:
       raise MQTTException(resp[3])
+      print(7)
     return resp[2] & 1
+   except OSError as e:
+     print(e)
 
   def disconnect(self):
     self.sock.write(b"\xe0\0")
